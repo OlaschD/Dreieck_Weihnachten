@@ -4,21 +4,22 @@
  Arduino     	: UNO
  Modul ID    	: 11101 mit Gehäuse
  Datum       	: 22.11.2023 (umprogrammiert)  - 15.12.2019
- Version:       : V2.1 (Änderung des Programms)
+ Version:       : V3.0 (Änderung des Programms)
  Schaltung in	: keine
  Hardwareinfo	: DI -> 6 (Anschluß Pin 6, Steuerung, +5V , GND)
  ToDo			: Taster zum weiterschalten der Programme, Poti für die Laufgeschwindigkeit
  Status      	: OK
  Einsatz	    : mein Zimmer
  Prog-Software  : PlatformIO auf Big5
- Vorlage:
-
+ Vorlage        : Weihnachtsdreieck von 2022
+ Hinweis		: aufteilung der Funktionen in eigene Dateien
 
 */
 
 // ****************** Biblioteken einbindenn **********************************
 #include "Arduino.h"
 #include <FastLED.h>
+#include <constans.h>
 // #include <Streaming.h>
 #define DEBUG // Auskommentieren wenn Serial.print nicht ausgeführt werden soll
 
@@ -28,23 +29,24 @@ FASTLED_USING_NAMESPACE
 
 // ******************** Variablen definieren **********************************
 // Variablen
-#define DATA_PIN 6
-#define LED_TYPE WS2811
-#define COLOR_ORDER GRB
-#define NUM_LEDS 152 // 165				// 60 + 60 + 22 + 22 = 164
-#define HALF_NUM (NUM_LEDS / 2)
-#define PHASEDELAY 30 // orginal 10
-#define PHASEDELAY3 0
-#define FRAMES_PER_SECOND 240
-#define Helligkeit 180
-#define BRIGHTNESS Helligkeit
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
-CRGB leds[NUM_LEDS];
+// #define DATA_PIN 6
+// #define LED_TYPE WS2811
+// #define COLOR_ORDER GRB
+// #define NUM_LEDS 152 // 165				// 60 + 60 + 22 + 22 = 164
+// #define HALF_NUM (NUM_LEDS / 2)
+// #define PHASEDELAY 30 // orginal 10
+// #define PHASEDELAY3 0
+// #define FRAMES_PER_SECOND 240
+// #define Helligkeit 180
+// #define BRIGHTNESS Helligkeit
+// #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+// CRGB leds[NUM_LEDS];
+
 #define PHASEDELAY2 80 // Millisekunden zwischen den Phasen
 // #define REDVAL    128  // 0..255 (red value of LED)
 // #define GREENVAL    0  // 0..255 (green value of LED)
 // #define BLUEVAL     0  // 0..255 (blue value of LED)
-String Versionen("V2.1");
+String Versionen("V3.0");
 int Anz = 5;
 int Speed = 3;				 // A= = Low 0 ist am schnellsten und 1023 = 5V
 void rainbow();				 // Regenbogenfarben laufend
@@ -66,14 +68,14 @@ void nextPattern();
 void Test();
 void Regenbogen();
 void die_zente_LED();
+void Ver();
 
 void setup()
 {
-	delay(2000);
 	Serial.begin(9600);
 	FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 	FastLED.show();
-
+    Ver();
 } //************************* Ende setup **************************************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
@@ -96,11 +98,6 @@ uint8_t duration = 0x78; // E6=230s Dauer 78 = 120sec
 
 void loop()
 {
-	;
-	// die_zente_LED();
-	;
-	// Test();
-	;
 	gPatterns[gCurrentPatternNumber]();
 	FastLED.setBrightness(Helligkeit);
 	gPatterns[gCurrentPatternNumber]();		 // nächstes P abspielenrogramm
@@ -112,25 +109,27 @@ void loop()
 } //************************* Ende Loop ***************************************
 //************ Unterprogramme *************************************************
 
+void Ver() {
+// #ifdef DEBUG
+  Serial.print("Version: ");
+  Serial.println(Versionen);
+  Serial.print("Name: ");
+  Serial.println("Weihnachtsdreick");
+  Serial.print("Datum");
+  Serial.print("22.11.2023");
+  Serial.print("Programmiert mit PlatformIO auf Big5");
+  Serial.print();
+  Serial.print();
+  Serial.println();
+// #endif
+}
+
 void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 {
 	gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
 }
 
-void Ver();
 
-// #ifdef DEBUG
-//   Serial.print("Version: ")
-//   Serial.println(Versionen)
-//   Serial.print("Name: ")
-//   Serial.println("Weihnachtsdreick")
-//   Serial.print("Datum")
-//   Serial.print("22.11.2023")
-//   Serial.print("Programmiert mit PlatformIO auf Big5")
-//   Serial.print()
-//   Serial.print()
-//   Serial.println()
-// #endif
 
 void Test()
 {
