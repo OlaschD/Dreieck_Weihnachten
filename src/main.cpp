@@ -79,7 +79,7 @@ void setup()
 } //************************* Ende setup **************************************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = {Regenbogen, larsonScanner, Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, juggle, bpm, sinelon, rainbow};
+SimplePatternList gPatterns = {Regenbogen, larsonScanner, Rain_schwinge, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, juggle, bpm, sinelon, rainbow};
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
 uint8_t gCurrentPatternNumber = 0; // Indexnummer des aktuell ausgewählten Musters
@@ -98,7 +98,7 @@ uint8_t duration = 0x78; // E6=230s Dauer 78 = 120sec
 
 void loop()
 {
-	gPatterns[gCurrentPatternNumber]();
+	// gPatterns[gCurrentPatternNumber]();
 	FastLED.setBrightness(Helligkeit);
 	gPatterns[gCurrentPatternNumber]();		 // nächstes P abspielenrogramm
 	FastLED.show();							 // Senden Sie das LED-Array an den eigentlichen LED-Streifen
@@ -115,11 +115,11 @@ void Ver() {
   Serial.println(Versionen);
   Serial.print("Name: ");
   Serial.println("Weihnachtsdreick");
-  Serial.print("Datum");
-  Serial.print("22.11.2023");
-  Serial.print("Programmiert mit PlatformIO auf Big5");
-  Serial.print();
-  Serial.print();
+  Serial.print("Datum: ");
+  Serial.println("22.11.2023  ");
+  Serial.println("Programmiert mit PlatformIO auf Big5");
+  Serial.print("-----------");
+  Serial.print("");
   Serial.println();
 // #endif
 }
@@ -133,6 +133,7 @@ void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 
 void Test()
 {
+	Serial.println("Test");
 	// Hier sind alle LED's an und es laufen alle Farben nach einander zufällig ab
 	uint8_t hue = random(0x00, 0xFF);
 	for (int pos2 = NUM_LEDS; pos2 > 0; pos2--)
@@ -156,6 +157,7 @@ void Test()
 
 void Band_mitte_nach_aussen()
 {
+	Serial.println("Band_mitte_nach_aussen");
 	uint8_t hue = random(0x00, 0xFF);
 	for (int pos2 = HALF_NUM; pos2 >= 0; pos2--)
 	{
@@ -174,6 +176,7 @@ void Band_mitte_nach_aussen()
 
 void Seiten_Farbe()
 {
+	Serial.println("SeitenFarben");
 	for (int pos = 0; pos <= HALF_NUM; pos++)
 	{
 		leds[pos] = CHSV(gHue, 255, 192);
@@ -429,6 +432,7 @@ void Wetter_sim()
 
 void larsonScanner2()
 {
+	Serial.println("larsonScanner2");
 	byte ledcount = NUM_LEDS;
 	byte sat = 255;
 	byte hue = (millis() / 100) % 255;
@@ -502,6 +506,7 @@ void larsonScanner2()
 
 void larsonScanner()
 {
+	Serial.println("larsonScanner");
 	static int led1 = 0;
 	static boolean reverse = false;
 	int i, ledcount = NUM_LEDS;
@@ -550,6 +555,7 @@ void larsonScanner()
 
 void Farbige_sinus_wellen()
 {
+	Serial.println("Farbige Sinus_wellen");
 	// fadeToBlackBy( leds, NUM_LEDS, 255);
 	for (byte i = 0; i < NUM_LEDS; i++)
 	{
@@ -565,12 +571,14 @@ void Farbige_sinus_wellen()
 
 void rainbow()
 {
+	Serial.println("Rainbow");
 	// FastLEDs eingebauter Regenbogengenerator
 	fill_rainbow(leds, NUM_LEDS, gHue, 2);
 }
 
 void sinelon()
 {
+	Serial.println("sinelon");
 	// zwei farbiger Punkt, der hin und her fegt, mit verblassenden Spuren im Gleichlauf bis zur Hälfte
 	fadeToBlackBy(leds, HALF_NUM, 20); // 20
 	int pos1 = beatsin16(13, 0, HALF_NUM - 1);
@@ -583,6 +591,7 @@ void sinelon()
 
 void Rain_schwinge()
 {
+	Serial.println("Rainschwinge");
 	for (byte i = 0; i < NUM_LEDS; i++)
 	{
 		leds[i] = CHSV((i * 10) + beatsin8(42), 255, beatsin8(125, 100, 192));
@@ -604,6 +613,7 @@ void Rain_schwinge()
 
 void bpm()
 {
+	Serial.println("bmp");
 	// farbige Streifen, die mit einer definierten Beats-Per-Minute (BPM) pulsieren
 	uint8_t BeatsPerMinute = 42;
 	CRGBPalette16 palette = PartyColors_p;
@@ -616,6 +626,7 @@ void bpm()
 
 void juggle()
 {
+	Serial.println("jungle");
 	// acht farbige Punkte, die sich synchron zueinander verweben
 	fadeToBlackBy(leds, NUM_LEDS, 20);
 	byte dothue = 0;
@@ -628,6 +639,7 @@ void juggle()
 void Regenbogen()
 { // ca 20 Leds mit ständig wechselnen Frarben und Schweif
   // Alle LEDS mit ständig wechselner Farbe
+  Serial.println("Regenbogen - P1");
 	for (int z = 0; z < Anz; z++)
 	{						// Schleife für Anzahl der Durchläufe
 		static uint8_t hue; // Var für Farbton
