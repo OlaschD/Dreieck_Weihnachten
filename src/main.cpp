@@ -49,7 +49,7 @@ FASTLED_USING_NAMESPACE
 // CRGB leds[NUM_LEDS];
 
 int Anz = 5;
-int Zeit = 2;
+int Zeit = 0;
 #define PHASEDELAY2 80 // Millisekunden zwischen den Phasen
 // #define REDVAL    128  // 0..255 (red value of LED)
 // #define GREENVAL    0  // 0..255 (green value of LED)
@@ -92,9 +92,7 @@ void setup()
 } //************************* Ende setup **************************************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { Band,
-								Punkt,
-								Regenbogen, 
+SimplePatternList gPatterns = { Regenbogen, 
 								larsonScanner, 
 								Rain_schwinge, 
 								larsonScanner2, 
@@ -105,7 +103,8 @@ SimplePatternList gPatterns = { Band,
 								juggle, 
 								bpm, 
 								sinelon, 
-								rainbow};
+								rainbow,
+								Band};
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
 uint8_t gCurrentPatternNumber = 0; // Indexnummer des aktuell ausgewählten Musters
@@ -173,6 +172,7 @@ void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 }
 
 void Punkt() {
+	Zeit = 0;	
 	for (int i = 0; i <= 200; i++)
 	{
 		Punkt_L();
@@ -186,7 +186,7 @@ void Punkt_R() {
 	{
 		leds[z] = CHSV(hue + random16(),255,255);
 		FastLED.show();
-		FastLED.delay(Zeit);
+		FastLED.delay(0);
 		if (z <= NUM_LEDS) {
 			for(int z = 0; z < NUM_LEDS; z++)
 			{
@@ -203,12 +203,12 @@ void Punkt_L() { // Schaltet nacheinander alle LEDs ein und anschliessend nachei
 	for (int z = 0; z < NUM_LEDS; z++) {                // alle LEDS durchlaufen
 		leds[z] = CHSV(hue + random16(), 255, 255);  // die entsprechende Led an
 		FastLED.show();                         // und nun ausgeben und anzeigen
-		FastLED.delay(Zeit);                                    // Zeit abwarten
+		// FastLED.delay(0);                                    // Zeit abwarten
 	}
 	for (int z = 0; z < NUM_LEDS; z++) {              // wieder alle durchlaufen
 		leds[z] = CRGB::Black;            // schaltet alle LEDs nacheinander aus
 		FastLED.show();                                 // ausgeben und anzeigen
-		FastLED.delay(Zeit);                     // und wieder die Zeit abwarten
+		// FastLED.delay(0);                     // und wieder die Zeit abwarten
 	}
 
 }
@@ -247,6 +247,7 @@ void Band_R() {
 
 void Band() {
 	int z = 0;
+	Zeit = 100;    // Gescvhwindigkeit
 	
 	for (z = 0; z <= 10; z++)
 	{
