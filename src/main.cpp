@@ -79,7 +79,18 @@ void setup()
 } //************************* Ende setup **************************************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = {Regenbogen, larsonScanner, Rain_schwinge, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, juggle, bpm, sinelon, rainbow};
+SimplePatternList gPatterns = {	Regenbogen, 
+								larsonScanner, 
+								Rain_schwinge, 
+								larsonScanner2, 
+								Test,
+								Band_mitte_nach_aussen, 
+								Seiten_Farbe, 
+								Farbige_sinus_wellen, 
+								juggle, 
+								bpm, 
+								sinelon, 
+								rainbow};
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
 uint8_t gCurrentPatternNumber = 0; // Indexnummer des aktuell ausgewählten Musters
@@ -107,7 +118,7 @@ void loop()
 	FastLED.show();							 // Senden Sie das LED-Array an den eigentlichen LED-Streifen
 	FastLED.delay(1000 / FRAMES_PER_SECOND); // Fügen Sie eine Verzögerung ein, um die Bildfrequenz gering zu halten
 	EVERY_N_MILLISECONDS(20) { gHue++; }	 // ziehe langsam die "Grundfarbe" durch den Regenbogen
-    if ( (Patternr_alt == Patternr_neu)) 
+    if ( (Patternr_neu == Patternr_alt)) 
 	{
 		Serial.print("ops");
 	}
@@ -129,7 +140,7 @@ void Ver() {
   Serial.print("Version: ");
   Serial.println(Versionen);
   Serial.print("Name: ");
-  Serial.println("Weihnachtsdreick");
+  Serial.println("Weihnachtsdreieck");
   Serial.print("Datum: ");
   Serial.println("22.11.2023  ");
   Serial.println("Programmiert mit PlatformIO auf Big5");
@@ -143,8 +154,6 @@ void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 {
 	gCurrentPatternNumber = (gCurrentPatternNumber + 1) % ARRAY_SIZE( gPatterns);
 }
-
-
 
 void Test()
 {
@@ -209,6 +218,9 @@ void Seiten_Farbe()
 
 void ledsHeartbeat(uint8_t hue, uint8_t saturation, uint8_t brightness, uint32_t duration)
 {
+		#ifdef DEBUG
+		   Serial.println("ledsHeartbeat";
+		#endif
 	const uint8_t patternHeartbeat[56] =
 		{
 			0, 0, 0, 0, 1, 2, 3, 4,
@@ -348,64 +360,6 @@ void Herzschlag()
 	ledsHeartbeatShiftColor(saturation, brightness, duration); // Sättigung, Helligkeit, Dauer
 	ledsHeartbeatRandomColor(saturation, brightness, duration);
 }
-
-//	void explosion(byte ledcount,byte rainbowWidth,byte sat, unsigned int duration) {
-//		memset(leds,0,ledcount*3);
-//		byte hue[NUM_LEDS];
-//
-//		// Farbverschiebung
-//		byte colorshift = (255*millis()/duration)%255;
-//		for(int i = 0; i < ledcount; i++)	{
-//			hue[i] = (i*255/rainbowWidth+colorshift)%255;
-//		}
-//
-//		// Farbton nach links verschieben (3 2 1 -> 4 3 2)
-//		for(int led = 0; led < ledcount/2; led++) {
-//			leds[led] = CHSV(hue[led], sat, 100);
-//		}
-//
-//		// Gerade Anzahl Leds
-//		// Farbton nach rechts verschieben (1 2 3 -> 4 3 2)
-//		if(ledcount%2 == 0) {
-//			for(int led = ledcount/2; led < ledcount; led++) {
-//				leds[led] = CHSV(hue[ledcount-led], sat, 100);
-//			}
-//		}
-//		// Ungerade Anzahl Leds
-//		// Farbton nach rechts verschieben (1 2 3 -> 4 3 2)
-//		else {
-//			for(int led = (ledcount/2)+1; led < ledcount; led++) {
-//				leds[led] = CHSV(hue[(ledcount-1)-led], sat, 100);
-//			}
-//			// Farbton nach links und rechts verschieben (2 1 2 -> 3 2 3)
-//			leds[(ledcount/2)] = CHSV(hue[(ledcount/2)], sat, 100);
-//		}
-//
-//		FastLED.show();
-//	}
-
-//	void implosion(byte ledcount,byte rainbowWidth,byte sat, unsigned int duration) {
-//		memset(leds,0,ledcount*3);
-//		byte hue[NUM_LEDS];
-//
-//		// Farbverschiebung
-//		byte colorshift = (255*millis()/duration)%255;
-//		for(int i = 0; i < ledcount; i++)	{
-//			hue[i] = (i*255/rainbowWidth+colorshift)%255;
-//		}
-//
-//		// Farbton nach rechts verschieben (3 2 1 -> 2 3 4)
-//		for(int led = 0; led < ledcount/2; led++) {
-//			leds[led] = CHSV(hue[(ledcount/2)-led], sat, 100);
-//		}
-//
-//		// Farbton nach links verschieben (3 2 1 -> 2 1 4)
-//		for(int led = ledcount/2; led < ledcount; led++) {
-//			leds[led] = CHSV(hue[led-(ledcount/2)], sat, 100);
-//		}
-//
-//		FastLED.show();
-//}
 
 void Wetter_sim()
 {
@@ -670,6 +624,7 @@ void juggle()
 		FastLED.delay(40);
 	}
 }
+
 void Regenbogen()
 { // ca 20 Leds mit ständig wechselnen Frarben und Schweif
   // Alle LEDS mit ständig wechselner Farbe
@@ -694,31 +649,3 @@ void Regenbogen()
 	}
 }
 
-/*
-void die_zente_LED()
-{						// jede 10. LED an und 9 aus laufend
-	static uint8_t hue; // Var für Farbton ersten drei LEDs 0,5sek mit Farbe einschalten                                                        // hier muß noch der digitalausgang des Schalters ausgelesen werden
-	FastLED.setBrightness(Helligkeit);
-	for (int8_t cycle = 0; cycle < 0; cycle++)
-	{ // 10 Durchläufe                   geändert
-		Serial.print(cycle);
-		// 	for (int step = 0; step < 10; step++) {
-		//       Serial.print("erste For Schleife");
-		// 	  for (uint16_t pixno = 0 ; pixno < 152;  pixno + 10) {
-		//          Serial.println("  - zweite For Schleife");
-		// 		leds[pixno + step] = CHSV(hue++, 255, 255);     // jedes 10. Pixel an
-		// 		Serial.print(pixno);
-		//       FastLED.show();
-		// 	  FastLED.delay(40);
-		// 	  }
-		// 	  for (uint16_t pixno = 0; pixno < 152; pixno + 10) {
-		//         leds[pixno + step] = CHSV(0, 0, 0);             // jedes 10. Pixel aaus
-		//         // Serial.print(" - "); Serial.print(pixno);
-		//         FastLED.show();
-		// 	    FastLED.delay(40);
-		//       }
-		// 	}
-	}
-
-	Serial.println("Test ob es läuft");
-}*/
