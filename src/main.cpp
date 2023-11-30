@@ -104,6 +104,7 @@ SimplePatternList gPatterns = { Regenbogen,
 								bpm, 
 								sinelon, 
 								rainbow,
+								Punkt,
 								Band};
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
@@ -132,22 +133,20 @@ void loop()
 	FastLED.show();							 // Senden Sie das LED-Array an den eigentlichen LED-Streifen
 	FastLED.delay(1000 / FRAMES_PER_SECOND); // Fügen Sie eine Verzögerung ein, um die Bildfrequenz gering zu halten
 	EVERY_N_MILLISECONDS(20) { gHue++; }	 // ziehe langsam die "Grundfarbe" durch den Regenbogen
-    if ( Patternr_alt == Patternr_neu) 
+    if ( Patternr_alt != Patternr_neu) 
 		{
 			// Serial.print("alte Programm Nr.: ");
 			// Serial.println(gCurrentPatternNumber);
 			// Patternr_alt = gCurrentPatternNumber;
-		}
-		else
-		{
+
 			Serial.print("neue Programm Nr.: ");
-			Serial.println(gCurrentPatternNumber);
-			Patternr_neu = gCurrentPatternNumber;
+			Serial.println(Patternr_neu);
+			Patternr_alt = Patternr_neu;
 		}
 
 	
 	EVERY_N_SECONDS(60) { nextPattern(); }	 // orginal 10       // Muster regelmäßig ändern
-	Patternr_alt = gCurrentPatternNumber;
+	// Patternr_alt = gCurrentPatternNumber;
 } //************************* Ende Loop ***************************************
 //************ Unterprogramme *************************************************
 
@@ -320,7 +319,7 @@ void Seiten_Farbe()
 void ledsHeartbeat(uint8_t hue, uint8_t saturation, uint8_t brightness, uint32_t duration)
 {
 		#ifdef DEBUG
-		   Serial.println("ledsHeartbeat";
+		   Serial.println("ledsHeartbeat");
 		#endif
 	const uint8_t patternHeartbeat[56] =
 		{
@@ -661,7 +660,10 @@ void rainbow()
 
 void sinelon()
 {
-	Serial.println("sinelon");
+	#ifdef DEBUG
+		Serial.println("sinelon");
+	#endif
+	
 	// zwei farbiger Punkt, der hin und her fegt, mit verblassenden Spuren im Gleichlauf bis zur Hälfte
 	fadeToBlackBy(leds, HALF_NUM, 20); // 20
 	int pos1 = beatsin16(13, 0, HALF_NUM - 1);
