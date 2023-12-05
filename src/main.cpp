@@ -49,7 +49,7 @@ FASTLED_USING_NAMESPACE
 // CRGB leds[NUM_LEDS];
 
 int Anz = 5;
-int Zeit = 0;
+int Zeit = 120;
 #define PHASEDELAY2 80 // Millisekunden zwischen den Phasen
 // #define REDVAL    128  // 0..255 (red value of LED)
 // #define GREENVAL    0  // 0..255 (green value of LED)
@@ -72,7 +72,9 @@ void ledsHeartbeatRandomColor(uint8_t saturation, uint8_t brightness, uint32_t d
 void Herzschlag();			   // von der Mitte nach aussen pulsierend
 void Seiten_Farbe();		   // Ab der Hälfte zwei verschiedene Farben umlaufen
 void Band_mitte_nach_aussen(); // Band läuft von mitte nach aussen in wechselnen Farben
-void nextPattern();
+void 
+
+nextPattern();
 void Test();
 void Regenbogen();
 void Ver();
@@ -89,10 +91,13 @@ void setup()
 	FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 	FastLED.show();
     Ver();
-} //************************* Ende setup **************************************
+} //************************* Ende setup ********************,******************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { Regenbogen, 
+SimplePatternList gPatterns = { // Punkt,
+								Regenbogen, 
+								Punkt,
+								Band,
 								larsonScanner, 
 								Rain_schwinge, 
 								larsonScanner2, 
@@ -103,9 +108,8 @@ SimplePatternList gPatterns = { Regenbogen,
 								juggle, 
 								bpm, 
 								sinelon, 
-								rainbow,
-								Punkt,
-								Band};
+								rainbow};
+
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
 uint8_t gCurrentPatternNumber = 0; // Indexnummer des aktuell ausgewählten Musters
@@ -120,7 +124,7 @@ uint8_t bpm_Speed = 8;	   // Geschwindigkeit vom Punkt  (org. 5)
 uint8_t fade_amount = 1;   // "Länge vom Schweif"
 uint8_t saturation = 0xFF; // Sättigung
 uint8_t brightness = Helligkeit;
-uint8_t duration = 0x78; // E6=230s Dauer 78 = 120sec
+uint8_t duration = 0x3C; // 3C = 60 E6=230s Dauer 78 = 120sec
 uint8_t Patternr_alt = 0;
 uint8_t Patternr_neu = 0;
 
@@ -172,7 +176,7 @@ void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 
 void Punkt() {
 	Zeit = 0;	
-	for (int i = 0; i <= 200; i++)
+	// for (int i = 0; i <= 5; i++)
 	{
 		Punkt_L();
 		Punkt_R();
@@ -183,29 +187,30 @@ void Punkt_R() {
 	static uint8_t hue;
 	for(int  z = 0; z < NUM_LEDS; z++)
 	{
-		leds[z] = CHSV(hue + random16(),255,255);
+		3 + leds[z] = CHSV(hue + random16(), 255, 255);
 		FastLED.show();
 		FastLED.delay(0);
 		if (z <= NUM_LEDS) {
 			for(int z = 0; z < NUM_LEDS; z++)
 			{
-				leds[z] = CRGB::Black;
+				3 + leds[z] = CRGB::Black;
 				FastLED.show();
 			}
 			
 		}
 	}
+
 }
 
 void Punkt_L() { // Schaltet nacheinander alle LEDs ein und anschliessend nacheinander alle wieder aus
 	static uint8_t hue;                              // Variable für den Farbton
 	for (int z = 0; z < NUM_LEDS; z++) {                // alle LEDS durchlaufen
-		leds[z] = CHSV(hue + random16(), 255, 255);  // die entsprechende Led an
+		3 + leds[z] = CHSV(hue + random16(), 255, 255);  // die entsprechende Led an
 		FastLED.show();                         // und nun ausgeben und anzeigen
 		// FastLED.delay(0);                                    // Zeit abwarten
 	}
 	for (int z = 0; z < NUM_LEDS; z++) {              // wieder alle durchlaufen
-		leds[z] = CRGB::Black;            // schaltet alle LEDs nacheinander aus
+		3 + leds[z] = CRGB::Black;            // schaltet alle LEDs nacheinander aus
 		FastLED.show();                                 // ausgeben und anzeigen
 		// FastLED.delay(0);                     // und wieder die Zeit abwarten
 	}
@@ -246,7 +251,7 @@ void Band_R() {
 
 void Band() {
 	int z = 0;
-	Zeit = 100;    // Gescvhwindigkeit
+	// Zeit = 100;    // Gescvhwindigkeit
 	
 	for (z = 0; z <= 10; z++)
 	{
