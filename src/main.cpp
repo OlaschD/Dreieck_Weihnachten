@@ -16,13 +16,15 @@
 
 */
 /* History
-
-
+ V 3.1  05.12.2023
+	- Hinzu fügen der Bibliotek Adafruit Neopixel
+ 
 */
 
 // ****************** Biblioteken einbindenn **********************************
 #include "Arduino.h"
 #include <FastLED.h>
+#include <Adafruit_NeoPixel.h>
 #include <constans.h>
 #include <math.h>
 
@@ -47,7 +49,7 @@ FASTLED_USING_NAMESPACE
 // #define BRIGHTNESS Helligkeit
 // #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 // CRGB leds[NUM_LEDS];
-
+Adafruit_NeoPixel pixels = Adafruit_NeoPixel(NUMPIXEL, PIN, NEO_GRB + NEO_KHZ800);
 int Anz = 5;
 int Zeit = 120;
 #define PHASEDELAY2 80 // Millisekunden zwischen den Phasen
@@ -72,9 +74,7 @@ void ledsHeartbeatRandomColor(uint8_t saturation, uint8_t brightness, uint32_t d
 void Herzschlag();			   // von der Mitte nach aussen pulsierend
 void Seiten_Farbe();		   // Ab der Hälfte zwei verschiedene Farben umlaufen
 void Band_mitte_nach_aussen(); // Band läuft von mitte nach aussen in wechselnen Farben
-void 
-
-nextPattern();
+void nextPattern();
 void Test();
 void Regenbogen();
 void Ver();
@@ -84,19 +84,37 @@ void Band_R();
 void Punkt();
 void Punkt_L();
 void Punkt_R();
+// Adafruit Neopixcel Funktionen
+void LED_X();
+void LED_jede_X(int wait);
+void cwipe();
+void raincycle();
+void rainbowCycle(uint8_t wait);
+void theaterRainbow(); 
+void theaterChaseRainbow(uint8_t wait);
+void show_Pixel();
+void showRandomPixels(int iterations, int delayMilliseconds, byte ledBrightness, bool randomizeColors);
+void KnightRider();
+void showKnightRider(int iterations, int delayMilliseconds, uint32_t color);
 
 void setup()
 {
 	Serial.begin(9600);
 	FastLED.addLeds<LED_TYPE, DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
 	FastLED.show();
+	
+
     Ver();
 } //************************* Ende setup ********************,******************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { // Punkt,
+SimplePatternList gPatterns = { KnightRider,
+								cwipe,
+								show_Pixel,
+								rainbow,
+								theaterRainbow,
 								Regenbogen, 
-								Punkt,
+								LED_X,
 								Band,
 								larsonScanner, 
 								Rain_schwinge, 
@@ -108,7 +126,8 @@ SimplePatternList gPatterns = { // Punkt,
 								juggle, 
 								bpm, 
 								sinelon, 
-								rainbow};
+								rainbow
+							  };
 
 // SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
 
@@ -137,7 +156,9 @@ void loop()
 	FastLED.show();							 // Senden Sie das LED-Array an den eigentlichen LED-Streifen
 	FastLED.delay(1000 / FRAMES_PER_SECOND); // Fügen Sie eine Verzögerung ein, um die Bildfrequenz gering zu halten
 	EVERY_N_MILLISECONDS(20) { gHue++; }	 // ziehe langsam die "Grundfarbe" durch den Regenbogen
-    if ( Patternr_alt != Patternr_neu) 
+    EVERY_N_BSECONDS( 10 ) { nextPattern(); }
+
+	if ( Patternr_alt != Patternr_neu) 
 		{
 			// Serial.print("alte Programm Nr.: ");
 			// Serial.println(gCurrentPatternNumber);
@@ -149,7 +170,7 @@ void loop()
 		}
 
 	
-	EVERY_N_SECONDS(60) { nextPattern(); }	 // orginal 10       // Muster regelmäßig ändern
+	// EVERY_N_SECONDS(60) { nextPattern(); }	 // orginal 10       // Muster regelmäßig ändern
 	// Patternr_alt = gCurrentPatternNumber;
 } //************************* Ende Loop ***************************************
 //************ Unterprogramme *************************************************
@@ -176,7 +197,7 @@ void nextPattern() // Füge eins zur aktuellen Pattern-Nummer hinzu bis zum Ende
 
 void Punkt() {
 	Zeit = 0;	
-	// for (int i = 0; i <= 5; i++)
+	for (int i = 0; i <= 10; i++)
 	{
 		Punkt_L();
 		Punkt_R();
@@ -757,3 +778,181 @@ void Regenbogen()
 	}
 }
 
+
+/*
+**************************************************************************
+*                                                                        *
+*            Ab hier alle Funktionen mit Adafruit Neopixel               *
+*                                                                        *
+**************************************************************************
+*/
+void LED_X() {
+	LED_jede_X(350);
+}
+
+void LED_jede_X(int wait) {
+    int firstPixelHue = 0;
+	for (int a = 0; a < 40; a++) 	{
+		for (int b = 0; b < count; b++) {
+			pixels.clear();
+			for (uint8_t c = b; c < pixels.numPixels(); c += count) 			{
+				int hue = firstPixelHue + c * 65536L / pixels.numPixels();
+				uint32_t color = pixels.gamma32(pixels.ColorHSV(hue));
+				pixels.setPixelColor(c, color);
+			}
+			pixels.show();
+			delay(wait);
+			firstPixelHue += 65536 / 90;			
+		}
+	}
+}
+
+void colorWipe(uint32_t color, int wait) {
+  for(uint16_t i=0; i < pixels.numPixels(); i++) { // For each pixel in pixels...
+    pixels.setPixelColor(i, color);         //  Set pixel's color (in RAM)
+    pixels.show();                          //  Update pixels to match
+    delay(wait);                           //  Pause for a moment
+  }
+}
+
+uint32_t Wheel(byte WheelPos) {
+  WheelPos = 255 - WheelPos;
+  if(WheelPos < 85) {
+    return pixels.Color(255 - WheelPos * 3, 0, WheelPos * 3);
+  }
+  if(WheelPos < 170) {
+    WheelPos -= 85;
+    return pixels.Color(0, WheelPos * 3, 255 - WheelPos * 3);
+  }
+  WheelPos -= 170;
+  return pixels.Color(WheelPos * 3, 255 - WheelPos * 3, 0);
+}
+void turnOffPixels()
+{
+    for (byte i = 0; i < NUMPIXEL; i++) {
+        pixels.setPixelColor(i, pixels.Color(0, 0, 0));
+    }
+    pixels.show();
+}
+
+
+void cwipe() {
+	// wechselnde Farben
+	{
+		colorWipe(pixels.Color(255,   0,   0)     , 75); // Red
+    	colorWipe(pixels.Color(  0, 255,   0)     , 75); // Green
+    	colorWipe(pixels.Color(  0,   0, 255)     , 75); // Blue
+	}
+}
+void rainCycle()	{
+	rainbowCycle(20);
+}
+void rainbowCycle(uint8_t wait) {
+  uint16_t i, j;
+
+  for(j=0; j<256*5; j++) { // 5 cycles of all colors on wheel
+    for(i=0; i< pixels.numPixels(); i++) {
+      pixels.setPixelColor(i, Wheel(((i * 256 / pixels.numPixels()) + j) & 255));
+    }
+    pixels.show();
+    delay(wait);
+  }
+}
+void theaterRainbow() 	{
+	theaterChaseRainbow(50); 
+}
+
+void theaterChaseRainbow(uint8_t wait) {
+  for (int j=0; j < 256; j++) {     // cycle all 256 colors in the wheel
+    for (int q=0; q < 4; q++) {
+      for (uint16_t i=0; i < pixels.numPixels(); i=i+4) {
+        pixels.setPixelColor(i+q, Wheel( (i+j) % 255));    //turn every third pixel on
+      }
+      pixels.show();
+
+      delay(wait);
+
+      for (uint16_t i=0; i < pixels.numPixels(); i=i+3) {
+        pixels.setPixelColor(i+q, 0);        //turn every third pixel off
+      }
+    }
+  }
+}
+
+void show_Pixel()	{
+	showRandomPixels(40, 100, 100, true);
+}
+
+
+void showRandomPixels(int iterations, int delayMilliseconds, byte ledBrightness, bool randomizeColors)
+{
+    uint32_t c = pixels.Color(ledBrightness, 0, 0);
+    for (int iter = 0; iter < iterations; iter++) {
+        turnOffPixels();
+        for (byte i = 0; i < NUMPIXEL; i++) {
+            if (random(0, 2) == 0) {
+                if (randomizeColors) {
+                    c = pixels.Color(random(ledBrightness), random(ledBrightness), random(ledBrightness));
+                }
+                pixels.setPixelColor(i, c);
+            }
+        }
+        pixels.show();
+        delay(delayMilliseconds);
+    }
+}
+
+void KnightRider()	{
+	showKnightRider(10, 25, gHue);
+}
+
+void showKnightRider(int iterations, int delayMilliseconds, uint32_t color)
+{
+	byte ledBrightness = 100;
+	uint32_t col = pixels.Color(100, 0, 0);
+    const byte STEP = 15;
+    byte dir = 0, headIndex = 0;
+    uint8_t r, g, b;
+    // uint32_t col;
+    uint32_t c = pixels.Color(ledBrightness, 0, 0);
+    turnOffPixels();
+
+    for (int iter = 0; iter < iterations; iter++) {
+        for (int i = 0; i < NUMPIXEL; i++) {
+            for (int k = 0; k < NUMPIXEL; k++) {
+				col = pixels.Color(random(ledBrightness), random(ledBrightness), random(ledBrightness));
+                // col = pixels.getPixelColor(k);
+
+                r = col >> 16;
+                g = col >> 8;
+                b = col;
+
+                if (r > 0) {
+                    r -= STEP;
+                    r = max(0, r);
+                }
+                if (g > 0) {
+                    g -= STEP;
+                    g = max(0, g);
+                }
+                if (b > 0) {
+                    b -= STEP;
+                    b = max(0, b);
+                }
+
+                pixels.setPixelColor(k, pixels.Color(r, g, b));
+            }
+
+            pixels.setPixelColor(headIndex, color);
+            if (dir == 0) {
+                headIndex++;
+            } else {
+                headIndex--;
+            }
+            pixels.show();
+            delay(delayMilliseconds);
+        }
+        dir++;
+        dir%=2;
+    }
+}
