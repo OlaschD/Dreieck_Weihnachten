@@ -29,7 +29,7 @@
 #include <math.h>
 
 // #include <Streaming.h>
-// #define DEBUG // Auskommentieren wenn Serial.print nicht ausgeführt werden soll
+#define DEBUG // Auskommentieren wenn Serial.print nicht ausgeführt werden soll
 
 FASTLED_USING_NAMESPACE
 // #define FASTLED_ALLOW_INTERRUPTS 1
@@ -56,7 +56,7 @@ int Zeit = 120;
 // #define REDVAL    128  // 0..255 (red value of LED)
 // #define GREENVAL    0  // 0..255 (green value of LED)
 // #define BLUEVAL     0  // 0..255 (blue value of LED)
-String Versionen("V3.0");
+String Versionen("V3.1");
 
 int Speed = 3;				 // A= = Low 0 ist am schnellsten und 1023 = 5V
 void rainbow();				 // Regenbogenfarben laufend
@@ -108,8 +108,9 @@ void setup()
 } //************************* Ende setup ********************,******************
 // Liste der durchzuführenden Muster. Jede ist als separate Funktion definiert.
 typedef void (*SimplePatternList[])();
-SimplePatternList gPatterns = { KnightRider,
-								cwipe,
+SimplePatternList gPatterns = { 
+								// cwipe,
+								KnightRider,
 								show_Pixel,
 								rainbow,
 								theaterRainbow,
@@ -128,9 +129,6 @@ SimplePatternList gPatterns = { KnightRider,
 								sinelon, 
 								rainbow
 							  };
-
-// SimplePatternList gPatterns = {Rain_schwinge, Herzschlag, larsonScanner2, Test, Band_mitte_nach_aussen, Seiten_Farbe, Farbige_sinus_wellen, larsonScanner, juggle, bpm, sinelon, Wetter_sim, rainbow };
-
 uint8_t gCurrentPatternNumber = 0; // Indexnummer des aktuell ausgewählten Musters
 uint8_t gHue = 0;				   // rotierende "Grundfarbe", die von vielen Mustern verwendet wird
 // Rufen Sie die aktuelle Musterfunktion einmal auf und aktualisieren Sie das 'leds'-Array
@@ -154,18 +152,21 @@ void loop()
 	gPatterns[gCurrentPatternNumber]();		 // nächstes P abspielenrogramm
 	Patternr_neu = gCurrentPatternNumber;
 	FastLED.show();							 // Senden Sie das LED-Array an den eigentlichen LED-Streifen
-	FastLED.delay(1000 / FRAMES_PER_SECOND); // Fügen Sie eine Verzögerung ein, um die Bildfrequenz gering zu halten
-	EVERY_N_MILLISECONDS(20) { gHue++; }	 // ziehe langsam die "Grundfarbe" durch den Regenbogen
-    EVERY_N_BSECONDS( 10 ) { nextPattern(); }
 
+	
+	// Serial.println((*SimplePatternList[])());
+	FastLED.delay(1000 / FRAMES_PER_SECOND); // Fügen Sie eine Verzögerung ein, um die Bildfrequenz gering zu halten
+	EVERY_N_MILLISECONDS(100) { gHue++; }	 // ziehe langsam die "Grundfarbe" durch den Regenbogen
+    EVERY_N_BSECONDS( 60 ) { nextPattern(); }
+	
 	if ( Patternr_alt != Patternr_neu) 
 		{
 			// Serial.print("alte Programm Nr.: ");
 			// Serial.println(gCurrentPatternNumber);
 			// Patternr_alt = gCurrentPatternNumber;
-
+			Serial.println("Durchlauf LOOP . . .");
 			Serial.print("neue Programm Nr.: ");
-			Serial.println(Patternr_neu);
+			Serial.println(Patternr_neu -1);
 			Patternr_alt = Patternr_neu;
 		}
 
@@ -182,7 +183,7 @@ void Ver() {
   Serial.print("Name: ");
   Serial.println("Weihnachtsdreieck");
   Serial.print("Datum: ");
-  Serial.println("22.11.2023  ");
+  Serial.println("11.12.2023  ");
   Serial.println("Programmiert mit PlatformIO auf Big5");
   Serial.print("-----------");
   Serial.print("");
@@ -274,7 +275,7 @@ void Band() {
 	int z = 0;
 	// Zeit = 100;    // Gescvhwindigkeit
 	
-	for (z = 0; z <= 10; z++)
+	for (z = 0; z <= 3; z++)
 	{
 		Band_R();
 		Band_L();
@@ -842,10 +843,10 @@ void cwipe() {
 		colorWipe(pixels.Color(255,   0,   0)     , 75); // Red
     	colorWipe(pixels.Color(  0, 255,   0)     , 75); // Green
     	colorWipe(pixels.Color(  0,   0, 255)     , 75); // Blue
-		colorWipe(pixels.Color(160,  32, 240)     , 75); // Pink
+		colorWipe(pixels.Color(255,  44, 238)     , 75); // Pink
 		colorWipe(pixels.Color(255, 255,   0)     , 75); // gelb
-		colorWipe(pixels.Color(155,  48, 255)     , 75); // purple
-		colorWipe(pixels.Color(  0, 154, 205)     , 75); // DeepSkyBlue
+		colorWipe(pixels.Color( 85,  26, 139)     , 75); // purple
+		colorWipe(pixels.Color(  0, 255, 128)     , 75); // DeepSkyBlue
 	}
 }
 void rainCycle()	{
@@ -884,7 +885,7 @@ void theaterChaseRainbow(uint8_t wait) {
 }
 
 void show_Pixel()	{
-	showRandomPixels(40, 100, 100, true);
+	showRandomPixels(40, 500, 100, true);
 }
 
 
@@ -907,14 +908,14 @@ void showRandomPixels(int iterations, int delayMilliseconds, byte ledBrightness,
 }
 
 void KnightRider()	{
-	showKnightRider(100, 500, gHue);
+	showKnightRider(10, 50, gHue);
 }
 
 void showKnightRider(int iterations, int delayMilliseconds, uint32_t color)
 {
 	byte ledBrightness = 50;
 	uint32_t col = pixels.Color(50, 0, 0);
-    const byte STEP = 10;
+    const byte STEP = 5;
     byte dir = 0, headIndex = 0;
     uint8_t r, g, b;
     // uint32_t col;
