@@ -842,6 +842,10 @@ void cwipe() {
 		colorWipe(pixels.Color(255,   0,   0)     , 75); // Red
     	colorWipe(pixels.Color(  0, 255,   0)     , 75); // Green
     	colorWipe(pixels.Color(  0,   0, 255)     , 75); // Blue
+		colorWipe(pixels.Color(160,  32, 240)     , 75); // Pink
+		colorWipe(pixels.Color(255, 255,   0)     , 75); // gelb
+		colorWipe(pixels.Color(155,  48, 255)     , 75); // purple
+		colorWipe(pixels.Color(  0, 154, 205)     , 75); // DeepSkyBlue
 	}
 }
 void rainCycle()	{
@@ -903,18 +907,18 @@ void showRandomPixels(int iterations, int delayMilliseconds, byte ledBrightness,
 }
 
 void KnightRider()	{
-	showKnightRider(10, 25, gHue);
+	showKnightRider(100, 500, gHue);
 }
 
 void showKnightRider(int iterations, int delayMilliseconds, uint32_t color)
 {
-	byte ledBrightness = 100;
-	uint32_t col = pixels.Color(100, 0, 0);
-    const byte STEP = 15;
+	byte ledBrightness = 50;
+	uint32_t col = pixels.Color(50, 0, 0);
+    const byte STEP = 10;
     byte dir = 0, headIndex = 0;
     uint8_t r, g, b;
     // uint32_t col;
-    uint32_t c = pixels.Color(ledBrightness, 0, 0);
+    // uint32_t c = pixels.Color(ledBrightness, 0, 0);
     turnOffPixels();
 
     for (int iter = 0; iter < iterations; iter++) {
